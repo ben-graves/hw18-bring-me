@@ -32,34 +32,48 @@
           let lat = 0;
           let lng = 0;
           places.forEach(place => {
-            const latlong = formatLatLong(place.latlong);
-            lat += latlong.lat;
-            lng += latlong.lng;
+            if (place.latlong){
+              const latlong = formatLatLong(place.latlong);
+              lat += latlong.lat;
+              lng += latlong.lng;
+            }
           });
           return {lat: lat/places.length, lng: lng/places.length}
         }
 
-        fetch('https://gist.githubusercontent.com/Ianfeather/0d1387747d134747025c046817b6e42c/raw/601364b1069ae020212e7c4793f22bf9dbaae253/california.json')
+        fetch('https://gist.githubusercontent.com/ben-graves/5b8fe403b6a07239cb1dab2faacdf9a7/raw/878aff58d6fcaeac379aaa836eb530f36cd865d8/bringme.json')
           .then(function(placesRaw) {
             placesRaw.text().then(JSON.parse).then((places) => {
-              console.log(averagePosition(places));
               var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 7,
+                zoom: 3,
                 center: averagePosition(places)
               });
 
               places.forEach(place => {
-                const marker = new google.maps.Marker({
-                  position: formatLatLong(place.latlong),
-                  map: map,
-                  title: place.name
-                });
-                var infowindow = new google.maps.InfoWindow({
-                   content: '<center><h1>'+place.name+', '+place.city+'</h1><h2>'+place.title+'</h2><iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fbuzzfeedbringme%2Fvideos%2F'+place.video_url.substring(48,64)+'%2F&show_text=0&width=476" width="476" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe></center>'
-                 });
-                 marker.addListener('click', function() {
-                  infowindow.open(map, marker);
-                });
+                if (place.latlong){
+                  const marker = new google.maps.Marker({
+                    position: formatLatLong(place.latlong),
+                    map: map,
+                    title: place.name
+                  });
+                  if (place.video_url){
+                    var infowindow = new google.maps.InfoWindow({
+                       content: '<center><h1>'+place.name+', '+place.city+'</h1><h2>'+place.title+'</h2><iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fbuzzfeedbringme%2Fvideos%2F'+place.video_url.substring(48,64)+'%2F&show_text=0&width=476" width="476" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe></center>'
+                     });
+                   } else if (place.bf_url) {
+                     var infowindow = new google.maps.InfoWindow({
+                       content: '<center><h1>'+place.name+', '+place.city+'</h1><a href="'+place.bf_url+'" target="_blank">'+place.title+'</a></center>'
+                     });
+                   }
+                   else {
+                     var infowindow = new google.maps.InfoWindow({
+                       content: '<center><h1>'+place.name+', '+place.city+'</h1><h2>'+place.title+'</h2></center>'
+                     });
+                   }
+                   marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                  });
+                }
               });
             })
           });

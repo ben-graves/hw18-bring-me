@@ -41,20 +41,33 @@
           return {lat: lat/places.length, lng: lng/places.length}
         }
 
+        const markers = ['red', 'orange', 'purple', 'red', 'blue', 'yellow', 'pink', 'green'];
+
+        const icons = {
+          food: 'http://icons.iconarchive.com/icons/icons8/ios7/24/Food-Cutlery-icon.png',
+          culture: 'http://icons.iconarchive.com/icons/icons8/ios7/24/Travel-Museum-icon.png',
+          outdoors: 'http://icons.iconarchive.com/icons/icons8/windows-8/24/City-Students-icon.png'
+        }
+
         fetch('https://gist.githubusercontent.com/ben-graves/5b8fe403b6a07239cb1dab2faacdf9a7/raw/878aff58d6fcaeac379aaa836eb530f36cd865d8/bringme.json')
           .then(function(placesRaw) {
             placesRaw.text().then(JSON.parse).then((places) => {
               var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 3,
-                center: averagePosition(places)
+                zoom: 10,
+                center: formatLatLong(places[0].latlong)
+                //zoom: 3,
+                //center: averagePosition(places)
               });
 
               places.forEach(place => {
+                console.log(place["hobbies/interests"]);
                 if (place.latlong){
                   const marker = new google.maps.Marker({
                     position: formatLatLong(place.latlong),
                     map: map,
-                    title: place.name
+                    title: place.name,
+                    icon: icons[place["hobbies/interests"]]
+                    //icon: 'http://maps.google.com/mapfiles/ms/icons/'+markers[Math.floor(Math.random()*markers.length)]+'-dot.png'
                   });
                   if (place.video_url){
                     var infowindow = new google.maps.InfoWindow({

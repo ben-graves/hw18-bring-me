@@ -49,7 +49,7 @@
           outdoors: 'http://icons.iconarchive.com/icons/icons8/windows-8/24/City-Students-icon.png'
         }
 
-        fetch('https://gist.githubusercontent.com/ben-graves/5b8fe403b6a07239cb1dab2faacdf9a7/raw/878aff58d6fcaeac379aaa836eb530f36cd865d8/bringme.json')
+        fetch('https://gist.githubusercontent.com/ben-graves/5b8fe403b6a07239cb1dab2faacdf9a7/raw/cb0657ed9bee51b88485e53fa1971d1b209d605c/bringme.json')
           .then(function(placesRaw) {
             placesRaw.text().then(JSON.parse).then((places) => {
               var map = new google.maps.Map(document.getElementById('map'), {
@@ -60,22 +60,28 @@
               });
 
               places.forEach(place => {
-                console.log(place["hobbies/interests"]);
                 if (place.latlong){
                   const marker = new google.maps.Marker({
                     position: formatLatLong(place.latlong),
                     map: map,
                     title: place.name,
+                    // icon:  {
+                    //     url: place.thumbnail_url, // url
+                    //     scaledSize: new google.maps.Size(100,100), // scaled size
+                    //     origin: new google.maps.Point(0,0), // origin
+                    //     anchor: new google.maps.Point(0, 0) // anchor
+                    // }
                     icon: icons[place["hobbies/interests"]]
                     //icon: 'http://maps.google.com/mapfiles/ms/icons/'+markers[Math.floor(Math.random()*markers.length)]+'-dot.png'
                   });
+                  console.log(place.thumbnail_url);
                   if (place.video_url){
                     var infowindow = new google.maps.InfoWindow({
                        content: '<center><h1>'+place.name+', '+place.city+'</h1><h2>'+place.title+'</h2><iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fbuzzfeedbringme%2Fvideos%2F'+place.video_url.substring(48,64)+'%2F&show_text=0&width=476" width="476" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe></center>'
                      });
                    } else if (place.bf_url) {
                      var infowindow = new google.maps.InfoWindow({
-                       content: '<center><h1>'+place.name+', '+place.city+'</h1><a href="'+place.bf_url+'" target="_blank">'+place.title+'</a></center>'
+                       content: '<center><h1>'+place.name+', '+place.city+'</h1><a href="'+place.bf_url+'" target="_blank"><img src="'+place.thumbnail_url+'"><h2>'+place.title+'</h2></a></center>'
                      });
                    }
                    else {
